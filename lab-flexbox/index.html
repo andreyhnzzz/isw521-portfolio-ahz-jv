@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Monitoreo Hídrico</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Ejercicio 1: Navbar -->
+  <nav class="navbar">
+    <div class="logo">🌊 Acueductos</div>
+    <ul class="nav-links">
+      <li>Inicio</li>
+      <li>Sensores</li>
+      <li>Alertas</li>
+      <li>Reportes</li>
+    </ul>
+    <button class="logout-btn">Cerrar Sesión</button>
+  </nav>
+
+  <!-- Ejercicio 3: Dashboard Layout -->
+  <div class="dashboard-layout">
+    
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li>📊 Resumen</li>
+          <li>💧 Tanques</li>
+          <li>⚡ Presiones</li>
+          <li>🧪 Calidad</li>
+          <li>⚙️ Configuración</li>
+        </ul>
+      </nav>
+    </aside>
+    
+    <main class="main-content">
+      <h2>Gráficos de Monitoreo en Tiempo Real</h2>
+      
+      <!-- Ejercicio 2: Sensor Grid -->
+      <section class="sensor-grid">
+        <div class="sensor-card">
+          <h3>💧 Nivel de Tanque Principal</h3>
+          <p class="sensor-value">73%</p>
+          <p class="sensor-label">Sector A — Actualizado hace 2 min</p>
+        </div>
+        <div class="sensor-card">
+          <h3>⚡ Presión de Red</h3>
+          <p class="sensor-value">45 PSI</p>
+          <p class="sensor-label">Calle 2 — Mínimo 40 PSI</p>
+        </div>
+        <div class="sensor-card">
+          <h3>🧪 Calidad del Agua</h3>
+          <p class="sensor-value">1.2 mg/L</p>
+          <p class="sensor-label">Cloro residual</p>
+        </div>
+        <div class="sensor-card">
+          <h3>🌊 Caudal de Entrada</h3>
+          <p class="sensor-value">250 L/min</p>
+          <p class="sensor-label">Naciente Sur</p>
+        </div>
+        <div class="sensor-card">
+          <h3>🌡️ Temperatura del Agua</h3>
+          <p class="sensor-value">22 °C</p>
+          <p class="sensor-label">Promedio de red</p>
+        </div>
+        <div class="sensor-card">
+          <h3>⚙️ Estado de Válvula</h3>
+          <p class="sensor-value">Abierta</p>
+          <p class="sensor-label">Emergencia Principal</p>
+        </div>
+      </section>
+      
+    </main>
+    
+    <aside class="alert-panel">
+      <h3>🔔 Alertas Activas</h3>
+      <div class="alert">⚠️ Presión baja — Sector B</div>
+      <div class="alert">✅ Cloro en rango normal</div>
+    </aside>
+    
+  </div>
+</body>
+</html>

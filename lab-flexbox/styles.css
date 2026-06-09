@@ -1,0 +1,167 @@
+/* Reset general */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Ejercicio 1: Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 60px;
+  background-color: #2c3e50;
+  color: white;
+  padding: 0 24px;
+}
+
+/* 
+ * ¿Qué hace justify-content: space-between en este contexto?
+ * R/ Reparte el espacio sobrante en el eje principal (main axis) colocando el 
+ * primer elemento al inicio (izquierda) y el último al final (derecha), 
+ * centrando los enlaces en el medio.
+ */
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 24px;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Ejercicio 3: Layout Principal */
+.dashboard-layout {
+  display: flex;
+  flex-direction: row;
+  min-height: calc(100vh - 60px);
+}
+
+.sidebar {
+  flex: 1;
+  background-color: #ecf0f1;
+  padding: 24px;
+  border-right: 1px solid #bdc3c7;
+}
+
+.sidebar ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.main-content {
+  flex: 3;
+  padding: 24px;
+  background-color: #f9f9f9;
+}
+
+.alert-panel {
+  flex: 1;
+  background-color: #ecf0f1;
+  padding: 24px;
+  border-left: 1px solid #bdc3c7;
+}
+
+.alert {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: white;
+  border-radius: 4px;
+  border-left: 4px solid #e74c3c;
+}
+
+/* 
+ * Reflexión:
+ * ¿Qué diferencia hay entre flex: 1 y flex-grow: 1? ¿Son exactamente lo mismo?
+ * R/ No son lo mismo. flex: 1 es un shorthand para flex-grow: 1, flex-shrink: 1, flex-basis: 0%.
+ * flex-grow: 1 solo cambia la capacidad de crecer, manteniendo flex-basis en auto.
+ *
+ * Si quisiéramos que el Sidebar nunca sea menor a 180px sin importar el flex-shrink, ¿qué propiedad agregarían?
+ * R/ Se usaría min-width: 180px; que actúa como un límite inferior (piso).
+ *
+ * Prueben cambiar flex: 3 del Main Content a flex: 5 — ¿Cómo afecta la proporción visual?
+ * R/ Si cambia a flex: 5, el total es 1+5+1 = 7. El Main Content ocuparía 5/7 del espacio, 
+ * siendo mucho más ancho en proporción al sidebar y al panel (1/7 cada uno).
+ */
+
+/* Ejercicio 2: Cuadrícula de Sensores IoT */
+.sensor-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 24px 0;
+}
+
+/* 
+ * ¿Qué diferencia hay entre align-items y align-content?
+ * R/ align-items controla cómo se alinean los elementos dentro de una sola fila.
+ * align-content controla cómo se distribuyen todas las filas juntas dentro del contenedor padre 
+ * cuando hay espacio sobrante y flex-wrap está activo.
+ */
+
+.sensor-card {
+  flex-basis: calc(33.333% - 16px);
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.sensor-value {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 12px 0 4px;
+  color: #2980b9;
+}
+
+.sensor-label {
+  font-size: 12px;
+  color: #7f8c8d;
+}
+
+/* Ejercicio 4: Reto Final (Responsividad) */
+@media (max-width: 768px) {
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .sidebar,
+  .alert-panel {
+    flex: none;
+    width: 100%;
+    min-height: auto;
+  }
+
+  .main-content {
+    flex: 1;
+  }
+
+  .sensor-card {
+    flex-basis: 100%; /* Tarjetas a una sola columna en móviles */
+  }
+}
+
+/*
+ * ¿Por qué min-height se usa en lugar de height: 100vh?
+ * R/ height: 100vh restringe la altura al 100% de la ventana, lo que puede causar que 
+ * el contenido se desborde o se corte si hay scroll. min-height: 100vh garantiza que 
+ * ocupe al menos la altura de la pantalla, pero permite crecer más si el contenido lo requiere.
+ */

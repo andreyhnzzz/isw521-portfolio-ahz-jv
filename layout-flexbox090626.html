@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini-proyecto Flexbox</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    /* ─────────────────────────────────────────
+       NAVBAR
+    ───────────────────────────────────────── */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      background: #1a1a2e;
+      padding: 0 32px;
+      height: 64px;
+    }
+
+    .navbar .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #7c6ff7;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .navbar .logo i {
+      font-size: 1.1rem;
+    }
+
+    .navbar .links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .navbar .links a {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .navbar .links a:hover {
+      color: #fff;
+    }
+
+    .navbar .cta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #7c6ff7;
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .navbar .cta:hover {
+      background: #5a4fcf;
+    }
+
+    /* ─────────────────────────────────────────
+       BODY WRAPPER (columnas)
+    ───────────────────────────────────────── */
+    .body-wrapper {
+      display: flex;
+      flex-direction: row;
+      flex: 1;
+      gap: 0;
+    }
+
+    .sidebar {
+      flex: 1;
+      background: #2b2d42;
+      color: #eee;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sidebar h2 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #7c6ff7;
+      margin-bottom: 8px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #ccc;
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 6px 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .sidebar a i {
+      width: 16px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #7c6ff7;
+    }
+
+    .sidebar a:hover {
+      background: #3d3f5a;
+      color: #fff;
+    }
+
+    .contenido {
+      flex: 3;
+      background: #ffffff;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .contenido h1 {
+      font-size: 1.5rem;
+      color: #1a1a2e;
+    }
+
+    .contenido p {
+      color: #555;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .card-row {
+      display: flex;
+      gap: 16px;
+    }
+
+    .card {
+      flex: 1;
+      background: #f8f7ff;
+      border: 1px solid #e0ddf8;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .card h3 {
+      font-size: 0.95rem;
+      color: #7c6ff7;
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      font-size: 0.85rem;
+    }
+
+    .panel {
+      flex: 1;
+      background: #f4f3ff;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-left: 2px solid #e0ddf8;
+    }
+
+    .panel h2 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #7c6ff7;
+      margin-bottom: 8px;
+    }
+
+    .panel-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid #e0ddf8;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      color: #444;
+    }
+
+    .panel-item i {
+      color: #7c6ff7;
+      width: 16px;
+      text-align: center;
+    }
+
+    /* ─────────────────────────────────────────
+       FOOTER (3 columnas iguales)
+    ───────────────────────────────────────── */
+    .footer {
+      display: flex;
+      background: #1a1a2e;
+      color: #aaa;
+      padding: 24px 32px;
+      gap: 32px;
+    }
+
+    .footer-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .footer-col h4 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #7c6ff7;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .footer-col a,
+    .footer-col p {
+      font-size: 0.82rem;
+      color: #888;
+      text-decoration: none;
+    }
+
+    .footer-col a:hover {
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR: logo izquierda · links · botón CTA -->
+  <nav class="navbar">
+    <span class="logo">
+      <i class="fa-solid fa-bolt"></i> FlexApp
+    </span>
+    <ul class="links">
+      <li><a href="#">Inicio</a></li>
+      <li><a href="#">Proyectos</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">Equipo</a></li>
+    </ul>
+    <button class="cta">
+      <i class="fa-solid fa-rocket"></i> Comenzar gratis
+    </button>
+  </nav>
+
+  <!-- BODY WRAPPER: sidebar (flex:1) | contenido (flex:3) | panel (flex:1) -->
+  <div class="body-wrapper">
+
+    <aside class="sidebar">
+      <h2>Navegación</h2>
+      <a href="#"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="#"><i class="fa-solid fa-chart-bar"></i> Analítica</a>
+      <a href="#"><i class="fa-solid fa-users"></i> Usuarios</a>
+      <a href="#"><i class="fa-solid fa-gear"></i> Configuración</a>
+      <a href="#"><i class="fa-solid fa-lock"></i> Seguridad</a>
+    </aside>
+
+    <main class="contenido">
+      <h1>Bienvenido al panel principal</h1>
+      <p>
+        Este layout fue construido usando <strong>únicamente Flexbox</strong>.
+        El wrapper del body usa <code>display: flex</code> con
+        <code>flex-direction: row</code> para generar las tres columnas.
+        Cada columna tiene su propio <code>flex</code> value: 1, 3 y 1.
+      </p>
+      <div class="card-row">
+        <div class="card">
+          <h3>Sidebar (flex: 1)</h3>
+          <p>Ocupa 1 parte proporcional del espacio disponible.</p>
+        </div>
+        <div class="card">
+          <h3>Contenido (flex: 3)</h3>
+          <p>Ocupa 3 partes. Es el área principal, la más ancha.</p>
+        </div>
+        <div class="card">
+          <h3>Panel (flex: 1)</h3>
+          <p>Igual que el sidebar, 1 parte del espacio total.</p>
+        </div>
+      </div>
+    </main>
+
+    <aside class="panel">
+      <h2>Panel lateral</h2>
+      <div class="panel-item"><i class="fa-solid fa-fire"></i> Actividad reciente</div>
+      <div class="panel-item"><i class="fa-solid fa-bell"></i> 3 notificaciones</div>
+      <div class="panel-item"><i class="fa-solid fa-clipboard-list"></i> Tareas pendientes</div>
+      <div class="panel-item"><i class="fa-solid fa-clock"></i> Última sesión: hoy</div>
+    </aside>
+
+  </div>
+
+  <!-- FOOTER: 3 columnas iguales con flex:1 cada una -->
+  <footer class="footer">
+    <div class="footer-col">
+      <h4><i class="fa-solid fa-box"></i> Producto</h4>
+      <a href="#">Funciones</a>
+      <a href="#">Precios</a>
+      <a href="#">Seguridad</a>
+    </div>
+    <div class="footer-col">
+      <h4><i class="fa-solid fa-building"></i> Empresa</h4>
+      <a href="#">Nosotros</a>
+      <a href="#">Blog</a>
+      <a href="#">Carreras</a>
+    </div>
+    <div class="footer-col">
+      <h4><i class="fa-solid fa-envelope"></i> Contacto</h4>
+      <p>hola@flexapp.com</p>
+      <p>+54 11 0000-0000</p>
+    </div>
+  </footer>
+
+</body>
+</html>

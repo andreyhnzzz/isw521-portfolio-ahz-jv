@@ -20,8 +20,8 @@
 /* 
  * ¿Qué hace justify-content: space-between en este contexto?
  * R/ Reparte el espacio sobrante en el eje principal (main axis) colocando el 
- * primer elemento al inicio (izquierda) y el último al final (derecha), 
- * centrando los enlaces en el medio.
+ * primer elemento al inicio (izquierda), el último al final (derecha), 
+ * y el elemento intermedio en el centro, distribuyendo el espacio uniformemente.
  */
 
 .nav-links {
@@ -111,7 +111,7 @@
  */
 
 .sensor-card {
-  flex-basis: calc(33.333% - 16px);
+  flex-basis: calc((100% - 32px) / 3);
   background-color: white;
   border: 1px solid #ddd;
   border-radius: 8px;

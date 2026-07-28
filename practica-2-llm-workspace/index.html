@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Workspace para probar prompts y comprender memoria de contexto, sessionStorage, localStorage y cookies.">
+  <title>Prompt Engineer Workspace</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <div class="ambient ambient--one" aria-hidden="true"></div>
+  <div class="ambient ambient--two" aria-hidden="true"></div>
+
+  <header class="app-header shell">
+    <a class="brand" href="#workspace" aria-label="Ir al workspace">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" role="img">
+          <path d="M7 3h10v4l-2.2 2.2a4 4 0 0 0-1.2 2.8v1.4a4 4 0 0 0 1.2 2.8L17 18.4V21H7v-2.6l2.2-2.2a4 4 0 0 0 1.2-2.8V12a4 4 0 0 0-1.2-2.8L7 7V3Z"/>
+        </svg>
+      </span>
+      <span>
+        <strong>Prompt Engineer</strong>
+        <small>Context Workspace</small>
+      </span>
+    </a>
+
+    <div class="session-controls">
+      <div id="tokenBadge" class="token-badge" data-state="none" aria-live="polite">
+        <span class="token-badge__dot" aria-hidden="true"></span>
+        <span id="tokenText">Sin sesión</span>
+        <span class="token-badge__track" aria-hidden="true">
+          <span id="tokenProgress" class="token-badge__progress"></span>
+        </span>
+      </div>
+      <button id="loginButton" class="primary-button primary-button--compact" type="button">
+        Iniciar sesión
+      </button>
+    </div>
+  </header>
+
+  <main id="workspace" class="workspace shell">
+    <aside class="panel panel--favorites" aria-labelledby="favoritesTitle">
+      <div class="panel__header">
+        <div>
+          <p class="eyebrow">Biblioteca persistente</p>
+          <h1 id="favoritesTitle">Prompts favoritos</h1>
+        </div>
+        <span id="favoritesCount" class="count-badge">0</span>
+      </div>
+
+      <p class="panel__description">
+        Se almacenan en <code>localStorage</code> y sobreviven al cierre del navegador.
+      </p>
+
+      <div id="favoritesList" class="favorites-list" aria-live="polite">
+        <div id="emptyFavorites" class="empty-state empty-state--compact">
+          <span class="empty-state__icon" aria-hidden="true">☆</span>
+          <strong>Aún no hay favoritos</strong>
+          <p>Escribe un prompt y guárdalo para reutilizarlo.</p>
+        </div>
+      </div>
+
+      <button id="saveFavoriteButton" class="secondary-button" type="button">
+        <span aria-hidden="true">＋</span>
+        Guardar prompt actual
+      </button>
+    </aside>
+
+    <section class="panel panel--conversation" aria-labelledby="conversationTitle">
+      <div class="panel__header panel__header--conversation">
+        <div>
+          <p class="eyebrow">Hilo aislado por pestaña</p>
+          <h2 id="conversationTitle">Conversación actual</h2>
+        </div>
+        <span class="context-pill">
+          <span class="context-pill__pulse" aria-hidden="true"></span>
+          Contexto activo
+        </span>
+      </div>
+
+      <div id="conversation" class="conversation" aria-live="polite" aria-label="Historial de conversación">
+        <div id="emptyConversation" class="empty-state empty-state--conversation">
+          <div class="empty-state__orb" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.8 4v-4.1A2.5 2.5 0 0 1 4 13.5v-8Z"/>
+              <path d="M8 8h8M8 12h5"/>
+            </svg>
+          </div>
+          <strong>Empieza un nuevo contexto</strong>
+          <p>Cada petición enviará el historial completo con el contrato exacto de la API.</p>
+        </div>
+
+        <div id="typingIndicator" class="typing" hidden aria-label="La IA está respondiendo">
+          <span>IA</span>
+          <i></i><i></i><i></i>
+        </div>
+      </div>
+
+      <div class="composer">
+        <label class="sr-only" for="prompt">Escribe tu prompt</label>
+        <textarea id="prompt" rows="1" maxlength="2000" placeholder="Escribe un prompt claro y específico…" autocomplete="off"></textarea>
+        <button id="sendButton" class="send-button" type="button" aria-label="Enviar prompt">
+          <span class="send-button__label">Enviar</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 16 8-16 8 3-8-3-8Zm3.2 7h8.3L6.4 6.5 7.2 11Zm0 2-.8 4.5 9.1-4.5H7.2Z"/></svg>
+          <span class="send-button__spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <p class="composer-hint">Enter para enviar · Shift + Enter para nueva línea</p>
+    </section>
+  </main>
+
+  <section class="storage-status shell" aria-label="Resumen del almacenamiento">
+    <article class="status-card">
+      <span class="status-card__icon status-card__icon--session" aria-hidden="true">S</span>
+      <div><small>sessionStorage</small><strong><span id="sessionMessageCount">0</span> mensajes</strong></div>
+    </article>
+    <article class="status-card">
+      <span class="status-card__icon status-card__icon--local" aria-hidden="true">L</span>
+      <div><small>localStorage</small><strong><span id="localFavoriteCount">0</span> favoritos</strong></div>
+    </article>
+    <article class="status-card">
+      <span class="status-card__icon status-card__icon--cookie" aria-hidden="true">C</span>
+      <div><small>Cookie llm_token</small><strong id="cookieState">Ausente</strong></div>
+    </article>
+  </section>
+
+  <div id="sessionModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDescription">
+    <div class="modal__card">
+      <div class="modal__icon" aria-hidden="true">!</div>
+      <p class="eyebrow eyebrow--danger">Status 401</p>
+      <h2 id="modalTitle">Tu sesión expiró</h2>
+      <p id="modalDescription">
+        El contexto de esta pestaña fue eliminado. Tus prompts favoritos permanecen intactos en localStorage.
+      </p>
+      <div class="modal__actions">
+        <button id="closeModalButton" class="secondary-button" type="button">Cerrar</button>
+        <button id="renewTokenButton" class="primary-button" type="button">Renovar token</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <noscript>Esta aplicación requiere JavaScript para funcionar.</noscript>
+
+  <script>
+/* ############################################################
+   BLOQUE 1 — SIMULADOR_API_LLM  (NO MODIFICAR — SE REEMPLAZA
+   POR LA VERSIÓN DEL PROFESOR EN LA EVALUACIÓN)
+   Léanlo con calma: aquí está el CONTRATO que su cliente
+   debe cumplir. Todo lo que necesitan saber está aquí.
+   ############################################################ */
+const ApiLLM = (() => {
+  const _p = "llm_token";           // nombre exacto de la cookie
+  const _f = /^tk_(\d+)$/;          // formato exacto del valor: tk_<epochMsExpiracion>
+
+  function _leerCookie() {
+    const m = document.cookie.match(new RegExp("(?:^|;\\s*)" + _p + "=([^;]+)"));
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  function _tokenValido(t) {
+    if (!t) return false;
+    const m = t.match(_f);
+    if (!m) return false;
+    return Date.now() < Number(m[1]);
+  }
+  function _contextoValido(h) {
+    return Array.isArray(h) && h.length > 0 && h.every(x =>
+      x && typeof x === "object" &&
+      (x.rol === "user" || x.rol === "ia") &&
+      typeof x.contenido === "string"
+    );
+  }
+  const _r = [
+    "Interesante. Reformulando tu contexto de %N mensajes: la clave está en la especificidad.",
+    "Con %N mensajes de contexto, mi análisis es: divide el problema antes de pedir código.",
+    "He leído tus %N mensajes. Sugerencia: define el formato de salida en el prompt.",
+    "Contexto de %N mensajes recibido. Un buen prompt declara rol, tarea y restricciones."
+  ];
+
+  async function enviar(historial) {
+    // latencia de red simulada
+    await new Promise(res => setTimeout(res, 350 + Math.random() * 900));
+
+    if (!_tokenValido(_leerCookie())) {
+      throw { status: 401, error: "TOKEN_AUSENTE_MALFORMADO_O_EXPIRADO" };
+    }
+    if (!_contextoValido(historial)) {
+      throw { status: 422, error: "FORMATO_DE_CONTEXTO_INVALIDO",
+              esperado: '[{ rol: "user"|"ia", contenido: string }, ...]' };
+    }
+    const frase = _r[historial.length % _r.length].replace("%N", historial.length);
+    return { status: 200, respuesta: frase };
+  }
+
+  return { enviar };
+})();
+Object.freeze(ApiLLM);
+  </script>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      import("./src/bootstrap.js")
+        .then(({ bootstrap }) => bootstrap({ apiLLM: ApiLLM }))
+        .catch(error => {
+          console.error("No fue posible iniciar la aplicación.", error);
+          document.body.dataset.bootstrapError = "true";
+        });
+    });
+  </script>
+</body>
+</html>

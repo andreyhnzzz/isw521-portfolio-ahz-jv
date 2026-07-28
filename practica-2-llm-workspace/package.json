@@ -1,0 +1,14 @@
+{
+  "name": "practica-2-memoria-contexto-llm",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Prompt Engineer Workspace con arquitectura hexagonal, sessionStorage, localStorage y cookies.",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python -m http.server 5500"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Prompt Engineer Workspace</title>
+<!--
+  ============================================================
+  PRÁCTICA 2 — MEMORIA DE CONTEXTO DEL LLM
+  ============================================================
+  Este archivo contiene DOS bloques de código:
+
+  1) SIMULADOR_API_LLM: la "API del LLM". Está CONGELADA
+     (Object.freeze) y PROHIBIDO modificarla. En la evaluación
+     se reemplazará por la versión del profesor: si su código
+     depende de haberla alterado, la nota es 0 en ese rubro.
+     SÍ pueden (y deben) LEERLA para entender su contrato.
+
+  2) Un "borrador generado por IA" del lado del cliente.
+     Compila, se ve bonito... y viola casi todos los
+     requerimientos de persistencia. Su trabajo es auditarlo
+     con la pestaña Application y repararlo módulo por módulo.
+
+  IMPORTANTE: las cookies no funcionan abriendo el archivo con
+  doble clic (file://). Usen un servidor local (Live Server,
+  python -m http.server, etc.).
+  ============================================================
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { background: #f3f4f6; padding: 24px; }
+  .top { max-width: 1060px; margin: 0 auto 16px; background: #fff; border: 1px solid #e5e7eb;
+         border-radius: 12px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .top h1 { font-size: 19px; color: #1f2937; }
+  #badgeToken { background: #fef3c7; color: #b45309; font-weight: 700; font-size: 13px;
+                padding: 8px 14px; border-radius: 10px; }
+  .cols { max-width: 1060px; margin: 0 auto; display: grid; grid-template-columns: 300px 1fr; gap: 16px; }
+  .panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px;
+           display: flex; flex-direction: column; min-height: 66vh; }
+  .panel h2 { font-size: 15px; color: #1f2937; }
+  .panel .sub { font-size: 11px; color: #6b7280; margin: 4px 0 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
+  #listaFavoritos { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+  .fav { background: #f3f4f6; border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+  .fav button { border: 0; background: none; color: #2563eb; cursor: pointer; font-size: 12px; padding: 2px 0; }
+  #btnGuardarFav { margin-top: 10px; border: 1.5px solid #2563eb; background: #fff; color: #2563eb;
+                   font-weight: 700; border-radius: 8px; padding: 9px; cursor: pointer; }
+  #conversacion { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 6px 0; }
+  .msg { max-width: 75%; padding: 9px 13px; border-radius: 13px; font-size: 13.5px; line-height: 1.45; }
+  .msg.user { align-self: flex-end; background: #dbeafe; }
+  .msg.ia   { align-self: flex-start; background: #e5e7eb; }
+  .fila { display: flex; gap: 8px; margin-top: 10px; }
+  #prompt { flex: 1; padding: 10px 13px; border: 1px solid #b4b4be; border-radius: 10px; font-size: 13.5px; }
+  .fila button, #btnLogin { padding: 10px 18px; border: 0; border-radius: 10px; background: #2563eb;
+                            color: #fff; font-weight: 700; cursor: pointer; }
+  #btnLogin { background: #16a34a; }
+  #modal { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none;
+           align-items: center; justify-content: center; }
+  #modal.visible { display: flex; }
+  .caja { background: #fff; border: 3px solid #dc2626; border-radius: 14px; width: 360px; overflow: hidden; }
+  .caja h3 { background: #fee2e2; color: #dc2626; padding: 12px 16px; font-size: 15px; }
+  .caja p  { padding: 14px 16px; font-size: 13.5px; }
+  .caja button { margin: 0 16px 16px; padding: 9px 16px; border: 0; border-radius: 8px;
+                 background: #2563eb; color: #fff; font-weight: 700; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>🧪 Prompt Engineer Workspace</h1>
+  <div style="display:flex; gap:10px; align-items:center;">
+    <span id="badgeToken">🍪 Sin sesión</span>
+    <button id="btnLogin">Iniciar sesión (emitir token)</button>
+  </div>
+</div>
+
+<div class="cols">
+  <div class="panel">
+    <h2>⭐ Prompts Favoritos</h2>
+    <div class="sub">Deben sobrevivir a reinicios del navegador</div>
+    <div id="listaFavoritos"></div>
+    <button id="btnGuardarFav">+ Guardar prompt actual</button>
+  </div>
+
+  <div class="panel">
+    <h2>💬 Conversación actual</h2>
+    <div class="sub">Pestaña duplicada = hilo nuevo en blanco</div>
+    <div id="conversacion"></div>
+    <div class="fila">
+      <input id="prompt" type="text" placeholder="Escribe tu prompt..." autocomplete="off">
+      <button id="btnEnviar">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal">
+  <div class="caja">
+    <h3>⚠ Sesión expirada (401)</h3>
+    <p>Tu token venció. La conversación actual se borró,
+       pero tus favoritos siguen intactos.</p>
+    <button id="btnCerrarModal">Entendido</button>
+  </div>
+</div>
+
+<script>
+/* ############################################################
+   BLOQUE 1 — SIMULADOR_API_LLM  (NO MODIFICAR — SE REEMPLAZA
+   POR LA VERSIÓN DEL PROFESOR EN LA EVALUACIÓN)
+   Léanlo con calma: aquí está el CONTRATO que su cliente
+   debe cumplir. Todo lo que necesitan saber está aquí.
+   ############################################################ */
+const ApiLLM = (() => {
+  const _p = "llm_token";           // nombre exacto de la cookie
+  const _f = /^tk_(\d+)$/;          // formato exacto del valor: tk_<epochMsExpiracion>
+
+  function _leerCookie() {
+    const m = document.cookie.match(new RegExp("(?:^|;\\s*)" + _p + "=([^;]+)"));
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  function _tokenValido(t) {
+    if (!t) return false;
+    const m = t.match(_f);
+    if (!m) return false;
+    return Date.now() < Number(m[1]);
+  }
+  function _contextoValido(h) {
+    return Array.isArray(h) && h.length > 0 && h.every(x =>
+      x && typeof x === "object" &&
+      (x.rol === "user" || x.rol === "ia") &&
+      typeof x.contenido === "string"
+    );
+  }
+  const _r = [
+    "Interesante. Reformulando tu contexto de %N mensajes: la clave está en la especificidad.",
+    "Con %N mensajes de contexto, mi análisis es: divide el problema antes de pedir código.",
+    "He leído tus %N mensajes. Sugerencia: define el formato de salida en el prompt.",
+    "Contexto de %N mensajes recibido. Un buen prompt declara rol, tarea y restricciones."
+  ];
+
+  async function enviar(historial) {
+    // latencia de red simulada
+    await new Promise(res => setTimeout(res, 350 + Math.random() * 900));
+
+    if (!_tokenValido(_leerCookie())) {
+      throw { status: 401, error: "TOKEN_AUSENTE_MALFORMADO_O_EXPIRADO" };
+    }
+    if (!_contextoValido(historial)) {
+      throw { status: 422, error: "FORMATO_DE_CONTEXTO_INVALIDO",
+              esperado: '[{ rol: "user"|"ia", contenido: string }, ...]' };
+    }
+    const frase = _r[historial.length % _r.length].replace("%N", historial.length);
+    return { status: 200, respuesta: frase };
+  }
+
+  return { enviar };
+})();
+Object.freeze(ApiLLM);
+
+
+/* ############################################################
+   BLOQUE 2 — CLIENTE ("borrador generado por IA")
+   La IA aseguró que cumple todos los requerimientos. Audítenlo
+   contra la pestaña Application y contra el contrato de arriba
+   ANTES de creerle. Repárenlo por módulos.
+   ############################################################ */
+
+const $ = id => document.getElementById(id);
+
+/* ---------- Módulo de sesión (conversación actual) ---------- */
+// Guardamos la conversación de forma persistente para que el
+// usuario nunca pierda su hilo de trabajo.
+function cargarConversacion() {
+  const c = localStorage.getItem("conversacion");
+  return c ? JSON.parse(c) : [];
+}
+function guardarConversacion(conv) {
+  localStorage.setItem("conversacion", JSON.stringify(conv));
+}
+
+/* ---------- Módulo de favoritos ---------- */
+// Los favoritos se consultan constantemente durante la sesión,
+// así que los dejamos en el almacenamiento de sesión, que es
+// más rápido y se limpia solo.
+function cargarFavoritos() {
+  const f = sessionStorage.getItem("favoritos");
+  return f ? JSON.parse(f) : [];
+}
+function guardarFavoritos(favs) {
+  sessionStorage.setItem("favoritos", JSON.stringify(favs));
+}
+
+/* ---------- Módulo de autenticación ---------- */
+function emitirToken() {
+  // Generamos un token aleatorio seguro para la API
+  const token = Math.random().toString(36).slice(2);
+  document.cookie = "token=" + token;
+  $("badgeToken").textContent = "🍪 Sesión activa";
+}
+
+/* ---------- Módulo de UI ---------- */
+function pintarMensaje(rol, contenido) {
+  const div = document.createElement("div");
+  div.className = "msg " + rol;
+  div.textContent = contenido;
+  $("conversacion").appendChild(div);
+  $("conversacion").scrollTop = $("conversacion").scrollHeight;
+}
+
+function pintarFavoritos() {
+  const lista = $("listaFavoritos");
+  lista.innerHTML = "";
+  cargarFavoritos().forEach(texto => {
+    const div = document.createElement("div");
+    div.className = "fav";
+    div.textContent = texto;
+    const btn = document.createElement("button");
+    btn.textContent = "Usar ▸";
+    btn.onclick = () => { $("prompt").value = texto; };
+    div.appendChild(document.createElement("br"));
+    div.appendChild(btn);
+    lista.appendChild(div);
+  });
+}
+
+/* ---------- Flujo principal ---------- */
+async function enviarPrompt() {
+  const texto = $("prompt").value.trim();
+  if (!texto) return;
+
+  const conv = cargarConversacion();
+  conv.push(texto);                       // agregamos el mensaje al contexto
+  guardarConversacion(conv);
+  pintarMensaje("user", texto);
+  $("prompt").value = "";
+
+  try {
+    const data = await ApiLLM.enviar(conv);
+    conv.push(data.respuesta);
+    guardarConversacion(conv);
+    pintarMensaje("ia", data.respuesta);
+  } catch (e) {
+    if (e.status === "401") {
+      // Sesión expirada: limpiamos todo el estado local
+      localStorage.clear();
+      $("modal").classList.add("visible");
+    }
+  }
+}
+
+function guardarFavorito() {
+  const texto = $("prompt").value.trim();
+  if (!texto) return;
+  const favs = cargarFavoritos();
+  favs.push(texto);
+  guardarFavoritos(favs);
+  pintarFavoritos();
+}
+
+/* ---------- Arranque ---------- */
+$("btnEnviar").addEventListener("click", enviarPrompt);
+$("prompt").addEventListener("keydown", e => { if (e.key === "Enter") enviarPrompt(); });
+$("btnGuardarFav").addEventListener("click", guardarFavorito);
+$("btnLogin").addEventListener("click", emitirToken);
+$("btnCerrarModal").addEventListener("click", () => $("modal").classList.remove("visible"));
+
+cargarConversacion().forEach(m => pintarMensaje(m.rol, m.contenido));
+pintarFavoritos();
+
+/* TODO (los deben resolver ustedes, no la IA "de un solo golpe"):
+   [ ] La conversación debe vivir en sessionStorage (pestaña nueva = hilo nuevo).
+   [ ] Los favoritos deben vivir en localStorage (sobrevivir reinicios).
+   [ ] La cookie debe llamarse y formatearse EXACTAMENTE como exige ApiLLM,
+       y expirar en 2 minutos (Max-Age). Pista: lean el Bloque 1.
+   [ ] El historial que se envía a ApiLLM debe cumplir el contrato (422).
+   [ ] Al recibir 401: mostrar modal, borrar SOLO la sesión, conservar favoritos.
+   [ ] El badge "Token expira en mm:ss" debe mostrar la cuenta regresiva real.
+*/
+</script>
+</body>
+</html>

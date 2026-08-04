@@ -1,0 +1,1 @@
+{"version":3,"file":"BaseNotification.d.ts","sourceRoot":"","sources":["BaseNotification.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,aAAa,EAAE,MAAM,gCAAgC,CAAC;AAEpE,8BAAsB,gBAAiB,YAAW,aAAa;IACjD,SAAS,CAAC,SAAS,EAAE,MAAM;IAAvC,YAAsB,SAAS,EAAE,MAAM,EAAI;IAE3C,QAAQ,CAAC,IAAI,CAAC,OAAO,EAAE,MAAM,GAAG,IAAI,CAAC;CACtC"}
